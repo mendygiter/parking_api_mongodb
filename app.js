@@ -25,11 +25,24 @@ app.get("/api/parking", (req, res) => {
     let results = data;
 
     queryKeys.forEach((key) => {
-        const value = req.query[key].toLowerCase().trim();
-        results = results.filter((record) => {
-            return record[key] && record[key].toLowerCase().trim() === value;
-        });
+        if (key === "start" || key === "end") {
+            const date = new Date(req.query[key]);
+
+            if (!isNaN(date.getTime())) {
+                results = result.filter((record) => {
+                    const recordDate = new Date(record[key]);
+                    retrun
+                    !isNaN(recordDate.getTime()) && (key === "start" ? recordDate >= date : recordDate <= date);
+                });
+            }
+        } else {
+            const value = req.query[key].toLowerCase().trim();
+            results = results.filter((record) => {
+                return record[key] && record[key].toLowerCase().trim() === value;
+            });
+        }
     });
+
 
     res.json(results);
 });
