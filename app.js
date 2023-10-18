@@ -3,7 +3,7 @@ const csv = require("csv-parser");
 const fs = require("fs");
 
 const app = express();
-const port = process.env.port || 3000;
+const port = process.env.port || 4001;
 const data = [];
 
 fs.createReadStream("test_records.csv")
@@ -15,36 +15,51 @@ fs.createReadStream("test_records.csv")
         console.log("file processed");
     });
 
-app.get("/api/parking", (req, res) => {
-    const queryKeys = Object.keys(req.query);
+function filterByDate(records,key, datetimeString) {
+    //const formattedDateTime = datetimeString.replace(" ", "T");
+   // const comparisonDate = new Date(formattedDateTime);
 
-    if (queryKeys.length === 0) {
-        return res.json(data);
+    return records.filter(record=> {
+        const recordDate = new Date(record[key]);
+        if(isNaN(recordDate.getTime())) return false;
+        if(key === "Start") return recordDate >= datetimeString;
+        if(key === "End") return recordDate <= datetimeString;
+        return false;
+    });
+}
+
+function filterByString(records, key, value) {
+    value = value.toLowerCase().trim();
+    return records.filter(record => {
+        const recordValue = record[key];
+        return recordValue && recordValue.toLowerCase().trim() === value;
+    });
+}
+
+app.get("/api/parking", (req, res) => {
+    let results = data.slice();
+
+    if (req.query["License Plate"]) {
+        results = filterByString(results, "License Plate", req.query["License Plate"]);
+    }
+    if (req.query.Lot) {
+        results = filterByString(results, "Lot", req.query.Lot);
+    }
+    if (req.query.Start) {
+        const startDate = new Date(req.query.Start);
+        if (!isNaN(startDate.getTime())) {
+            results = filterByDate(results, "Start", startDate);
+        }
+    }
+    if (req.query.End) {
+        const endDate = new Date(req.query.End);
+        if (!isNaN(endDate.getTime())) {
+            results = filterByDate(results, 'End', endDate);
+        }
     }
 
-    let results = data;
-
-    queryKeys.forEach((key) => {
-        if (key === "start" || key === "end") {
-            const date = new Date(req.query[key]);
-
-            if (!isNaN(date.getTime())) {
-                results = result.filter((record) => {
-                    const recordDate = new Date(record[key]);
-                    retrun
-                    !isNaN(recordDate.getTime()) && (key === "start" ? recordDate >= date : recordDate <= date);
-                });
-            }
-        } else {
-            const value = req.query[key].toLowerCase().trim();
-            results = results.filter((record) => {
-                return record[key] && record[key].toLowerCase().trim() === value;
-            });
-        }
-    });
-
-
     res.json(results);
+
 });
 
 app.listen(port, () => {
