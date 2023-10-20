@@ -1,8 +1,10 @@
 const express = require("express");
+const db = require("./db");
 const csv = require("csv-parser");
 const fs = require("fs");
 
 const app = express();
+const Parking = mongoose.model("Parking", parkingSchema)
 const port = process.env.port || 4001;
 const data = [];
 
@@ -36,26 +38,13 @@ function filterByString(records, key, value) {
     });
 }
 
-app.get("/api/parking", (req, res) => {
-    let results = data.slice();
+app.get("/api/parking", async (req, res) => {
+    const query = {};
 
     if (req.query["License Plate"]) {
-        results = filterByString(results, "License Plate", req.query["License Plate"]);
+        query["License Plate"] = req.query["License Plate"];
     }
-    if (req.query.Lot) {
-        results = filterByString(results, "Lot", req.query.Lot);
-    }
-    if (req.query.Start) {
-        const startDate = new Date(req.query.Start);
-        if (!isNaN(startDate.getTime())) {
-            results = filterByDate(results, "Start", startDate);
-        }
-    }
-    if (req.query.End) {
-        const endDate = new Date(req.query.End);
-        if (!isNaN(endDate.getTime())) {
-            results = filterByDate(results, 'End', endDate);
-        }
+
     }
 
     res.json(results);
