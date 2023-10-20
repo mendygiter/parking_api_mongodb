@@ -1,12 +1,19 @@
 const express = require("express");
+const mongoose = require ("mongoose");
 const db = require("./db");
 const csv = require("csv-parser");
 const fs = require("fs");
 
-const app = express();
+
+const parkingSchema = new mongoose.Schema({
+    
+});
 const Parking = mongoose.model("Parking", parkingSchema)
+
+const app = express();
 const port = process.env.port || 4001;
 const data = [];
+
 
 fs.createReadStream("test_records.csv")
     .pipe(csv())
@@ -43,7 +50,7 @@ app.get("/api/parking", async (req, res) => {
         query["License Plate"] = req.query["License Plate"];
     }
     if (req.query.Lot) {
-        query.Lot = rew.query.Lot;
+        query.Lot = req.query.Lot;
     }
     if (req.query.Start) {
         query.Start = {$gte: new Date(req.query.Start)};
@@ -59,8 +66,8 @@ app.get("/api/parking", async (req, res) => {
     }
 });
 
-    res.json(results);
-
+/*     res.json(results);
+ */
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
