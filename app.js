@@ -18,8 +18,6 @@ fs.createReadStream("test_records.csv")
     });
 
 function filterByDate(records,key, datetimeString) {
-    //const formattedDateTime = datetimeString.replace(" ", "T");
-   // const comparisonDate = new Date(formattedDateTime);
 
     return records.filter(record=> {
         const recordDate = new Date(record[key]);
@@ -44,12 +42,24 @@ app.get("/api/parking", async (req, res) => {
     if (req.query["License Plate"]) {
         query["License Plate"] = req.query["License Plate"];
     }
-
+    if (req.query.Lot) {
+        query.Lot = rew.query.Lot;
     }
+    if (req.query.Start) {
+        query.Start = {$gte: new Date(req.query.Start)};
+    }
+    if (req.query.End) {
+        query.End = {$gte: new Date(req.query.End)};
+    }
+    try {
+        const results = await Parking.find(query);
+        res.json(results);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
 
     res.json(results);
-
-});
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
