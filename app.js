@@ -1,20 +1,21 @@
 const express = require("express");
 const mongoose = require ("mongoose");
-const db = require("./db");
+/* const db = require("./db"); */
 const csv = require("csv-parser");
 const fs = require("fs");
-
-
 const parkingSchema = new mongoose.Schema({
     
 });
-const Parking = mongoose.model("Parking", parkingSchema)
+const Parking = require("./db");
 
+/* const Parking = mongoose.model("Parking", parkingSchema)
+ */
 const app = express();
 const port = process.env.port || 4001;
 const data = [];
 
 
+/* Only need this if pulling from local file
 fs.createReadStream("test_records.csv")
     .pipe(csv())
     .on("data", (row) => {
@@ -22,7 +23,7 @@ fs.createReadStream("test_records.csv")
     })
     .on("end", () => {
         console.log("file processed");
-    });
+    }); */
 
 function filterByDate(records,key, datetimeString) {
 
