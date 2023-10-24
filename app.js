@@ -2,13 +2,11 @@ const express = require("express");
 const mongoose = require ("mongoose");
 const csv = require("csv-parser");
 const fs = require("fs");
-const parkingSchema = new mongoose.Schema({
-    
-});
+const parkingSchema = new mongoose.Schema({ });
 const Parking = require("./db");
 
 const app = express();
-const port = process.env.port || 4001;
+const port = process.env.port || 5001;
 const data = [];
 
 function filterByDate(records,key, datetimeString) {

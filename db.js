@@ -20,6 +20,4 @@ db.once("open", function() {
     console.log("connected to MongoDB");
 });
 
-
-
 module.exports = Parking;
